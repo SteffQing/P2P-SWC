@@ -2,6 +2,8 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Script.sol";
+import "forge-std/console.sol";
+import "forge-std/Vm.sol";
 import "../src/deployer/WAlletDeployer.sol";
 
 contract DeployScript is Script {
@@ -29,6 +31,24 @@ contract DeployScript is Script {
         console.log("HOTWALLET_ADMIN address:", HOTWALLET_ADMIN);
         console.log("DEPLOYER_ADMIN address:", DEPLOYER_ADMIN);
         console.log("OWNER address:", vm.addr(OWNER_PK));
+
+        vm.stopBroadcast();
+
+        vm.startBroadcast(DEPLOYER_ADMIN_PK);
+
+        vm.recordLogs();
+        deployer.deployWallet();
+
+        Vm.Log[] memory logs = vm.getRecordedLogs();
+
+        for (uint256 i = 0; i < logs.length; i++) {
+            if (logs[i].topics[0] == keccak256("WalletCreated(address)")) {
+                address walletAddress = address(
+                    uint160(uint256(logs[i].topics[1]))
+                );
+                console.log("New Smart Wallet deployed at:", walletAddress);
+            }
+        }
 
         vm.stopBroadcast();
     }
