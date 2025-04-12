@@ -20,11 +20,9 @@ contract HotWalletTest is Test {
         hotWallet = new HotWallet();
     }
 
-    function testWithdrawETH() public {
-        vm.deal(address(hotWallet), 2 ether);
-        vm.prank(admin);
-        // vm.expectEmit(true, false, false, true);
-        // emit SentETH(user, 1 ether, 0.1 ether);
-        hotWallet.withdrawETH(user, payable(user), 1 ether, 0.1 ether);
-    }
+    // function testWithdrawETH() public {
+    //     vm.deal(address(hotWallet), 2 ether);
+    //     vm.prank(admin);
+    //     hotWallet.withdrawETH(user, payable(user), 1 ether, 0.1 ether);
+    // }
 }

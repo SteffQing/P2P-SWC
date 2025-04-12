@@ -24,9 +24,12 @@ contract WAAS_DeployerTest is Test {
 
     function testDeployWallet() public {
         vm.prank(deployAdmin);
+        uint256 gasStart = gasleft();
         // vm.expectEmit(true, false, false, true);
         // emit WalletCreated(address(0)); // We don't know the exact address in advance
         deployer.deployWallet();
+        uint256 gasUsed = gasStart - gasleft();
+        emit log_named_uint("Gas used for deployWallet()", gasUsed);
     }
 
     function testChangeOwner() public {

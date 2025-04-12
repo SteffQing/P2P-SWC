@@ -27,29 +27,29 @@ contract DeployScript is Script {
         );
 
         console.log("Deployed WAAS_Deployer at:", address(deployer));
-        console.log("SMARTWALLET_ADMIN address:", SMARTWALLET_ADMIN);
-        console.log("HOTWALLET_ADMIN address:", HOTWALLET_ADMIN);
-        console.log("DEPLOYER_ADMIN address:", DEPLOYER_ADMIN);
-        console.log("OWNER address:", vm.addr(OWNER_PK));
+        // console.log("SMARTWALLET_ADMIN address:", SMARTWALLET_ADMIN);
+        // console.log("HOTWALLET_ADMIN address:", HOTWALLET_ADMIN);
+        // console.log("DEPLOYER_ADMIN address:", DEPLOYER_ADMIN);
+        // console.log("OWNER address:", vm.addr(OWNER_PK));
 
         vm.stopBroadcast();
 
-        vm.startBroadcast(DEPLOYER_ADMIN_PK);
+        // vm.startBroadcast(DEPLOYER_ADMIN_PK);
 
-        vm.recordLogs();
-        deployer.deployWallet();
+        // vm.recordLogs();
+        // deployer.deployWallet();
 
-        Vm.Log[] memory logs = vm.getRecordedLogs();
+        // Vm.Log[] memory logs = vm.getRecordedLogs();
 
-        for (uint256 i = 0; i < logs.length; i++) {
-            if (logs[i].topics[0] == keccak256("WalletCreated(address)")) {
-                address walletAddress = address(
-                    uint160(uint256(logs[i].topics[1]))
-                );
-                console.log("New Smart Wallet deployed at:", walletAddress);
-            }
-        }
+        // for (uint256 i = 0; i < logs.length; i++) {
+        //     if (logs[i].topics[0] == keccak256("WalletCreated(address)")) {
+        //         address walletAddress = address(
+        //             uint160(uint256(logs[i].topics[1]))
+        //         );
+        //         console.log("New Smart Wallet deployed at:", walletAddress);
+        //     }
+        // }
 
-        vm.stopBroadcast();
+        // vm.stopBroadcast();
     }
 }
