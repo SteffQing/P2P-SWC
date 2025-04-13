@@ -41,8 +41,9 @@ contract Relayer is Owner {
     }
 
     function sendToken(address from, address to, uint256 amount, address token) private {
-        require(IERC20(token).balanceOf(from) >= amount, "Sender has insufficient balance");
-        SafeTransferLib.safeTransfer(ERC20(token), to, amount);
+        ERC20 _token = ERC20(token);
+        require(_token.balanceOf(from) >= amount, "Sender has insufficient balance");
+        SafeTransferLib.safeTransfer(_token, to, amount);
     }
 
     function send(address from, address to, uint256 amount, address token) external onlyRelayer {
