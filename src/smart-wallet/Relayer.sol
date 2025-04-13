@@ -14,7 +14,7 @@ contract Relayer is Owner {
 
     event TransactionSent(address indexed from, address indexed to, uint256 amount, address indexed token);
 
-    mapping(address => bool) public relayers;
+    mapping(address => bool) private relayers;
 
     constructor(address first_relayer) Owner(first_relayer) {
         relayers[first_relayer] = true;
@@ -40,8 +40,8 @@ contract Relayer is Owner {
         SafeTransferLib.safeTransferETH(to, amount);
     }
 
-    function sendToken(address to, uint256 amount, address token) private {
-        require(IERC20(token).balanceOf(to) >= amount, "Sender has insufficient balance");
+    function sendToken(address from, address to, uint256 amount, address token) private {
+        require(IERC20(token).balanceOf(from) >= amount, "Sender has insufficient balance");
         SafeTransferLib.safeTransfer(ERC20(token), to, amount);
     }
 
@@ -49,7 +49,7 @@ contract Relayer is Owner {
         if (token == address(0)) {
             sendETH(from, to, amount); 
         } else {
-            sendToken(to, amount, token); 
+            sendToken(from, to, amount, token); 
         }
         emit TransactionSent(from, to, amount, token);
     }
