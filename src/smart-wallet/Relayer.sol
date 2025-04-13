@@ -4,11 +4,6 @@ import "../lib/SafeTransferLib.sol";
 import "../lib/ERC20.sol";
 import "../utils/Owner.sol";
 
-interface IERC20 {
-    function transfer(address recipient, uint256 amount) external returns (bool);
-    function balanceOf(address who) external returns (uint);
-}
-
 
 contract Relayer is Owner {
 
