@@ -10,15 +10,10 @@ contract DeployScript is Script {
     function run() external {
         uint256 OWNER_PK = vm.envUint("OWNER");
 
-        uint256 SMARTWALLET_ADMIN_PK = vm.envUint("SMARTWALLET_ADMIN");
-        address SMARTWALLET_ADMIN = vm.addr(SMARTWALLET_ADMIN_PK);
-
         // Start broadcasting transactions using the Owner private key
         vm.startBroadcast(OWNER_PK);
 
-        Relayer deployer = new Relayer(
-            SMARTWALLET_ADMIN
-        );
+        Relayer deployer = new Relayer();
 
         console.log("Deployed Relayer at:", address(deployer));
         vm.stopBroadcast();
