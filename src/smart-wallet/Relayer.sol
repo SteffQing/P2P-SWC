@@ -3,50 +3,47 @@ pragma solidity ^0.8.0;
 import "../lib/SafeTransferLib.sol";
 import "../lib/ERC20.sol";
 
-
 contract Relayer {
-
-    event TransactionSent(address indexed from, address indexed to, uint256 amount, address indexed token);
-
-    // mapping(address => bool) private relayers;
-
-    // constructor(address first_relayer) Owner(first_relayer) {
-    //     relayers[first_relayer] = true;
-    // }
-
-    // modifier onlyRelayer() {
-    //     require(relayers[msg.sender], "Only whitelisted relayers can call this function");
-    //     _;
-    // }
-
-    // function addRelayer(address _relayer) external {
-    //     onlyOwner();
-    //     relayers[_relayer] = true;
-    // }
-
-    // function removeRelayer(address _relayer) external {
-    //     onlyOwner();
-    //     relayers[_relayer] = false;
-    // }
+    event TransactionSent(
+        address indexed from,
+        address indexed to,
+        uint256 amount,
+        address indexed token
+    );
 
     function sendETH(address from, address to, uint256 amount) private {
-        require(address(from).balance >= amount, "Sender has insufficient balance");
+        require(
+            address(from).balance >= amount,
+            "Sender has insufficient balance"
+        );
         SafeTransferLib.safeTransferETH(to, amount);
     }
 
-    function sendToken(address from, address to, uint256 amount, address token) private {
+    function sendToken(
+        address from,
+        address to,
+        uint256 amount,
+        address token
+    ) private {
         ERC20 _token = ERC20(token);
-        require(_token.balanceOf(from) >= amount, "Sender has insufficient balance");
+        require(
+            _token.balanceOf(from) >= amount,
+            "Sender has insufficient balance"
+        );
         SafeTransferLib.safeTransfer(_token, to, amount);
     }
 
-    function send(address from, address to, uint256 amount, address token) external {
+    function send(
+        address from,
+        address to,
+        uint256 amount,
+        address token
+    ) external {
         if (token == address(0)) {
-            sendETH(from, to, amount); 
+            sendETH(from, to, amount);
         } else {
-            sendToken(from, to, amount, token); 
+            sendToken(from, to, amount, token);
         }
         emit TransactionSent(from, to, amount, token);
     }
-
 }
