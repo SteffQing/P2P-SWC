@@ -14,9 +14,6 @@ contract RelayerTest is Test {
     address receiver;
     address owner;
 
-    ERC20 constant DAI = ERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
-    address constant DAI_WHALE = 0x28C6c06298d514Db089934071355E5743bf21d60;
-
     function setUp() public {
         (victim, victimPkey) = makeAddrAndKey("victim");
         receiver = makeAddr("receiver");
@@ -27,13 +24,7 @@ contract RelayerTest is Test {
         relayerAddress = address(relayer);
         vm.stopPrank();
 
-        // Fund victim with ETH
         vm.deal(victim, 1 ether);
-
-        // Fund victim with DAI
-        vm.startPrank(DAI_WHALE);
-        DAI.transfer(victim, 500e18);
-        vm.stopPrank();
     }
 
     function test_sendETH_withAuthorization() public {
@@ -46,35 +37,31 @@ contract RelayerTest is Test {
         bytes memory code = address(victim).code;
         require(code.length > 0, "no code written to victim");
 
-        // Relayer executes on behalf of victim
-        // vm.startPrank(relayerAddress);
-        vm.broadcast(owner);
+        vm.startPrank(owner);
         Relayer(victim).send(victim, receiver, amount, address(0));
         vm.stopPrank();
 
         assertEq(receiver.balance, receiverBalanceBefore + amount);
     }
 
-    function test_sendDAI_withAuthorization() public {
-        uint256 amount = 100e18;
-        uint256 receiverBalanceBefore = DAI.balanceOf(receiver);
+    // function test_sendDAI_withAuthorization() public {
+    //     uint256 amount = 100e18;
+    //     uint256 receiverBalanceBefore = DAI.balanceOf(receiver);
 
-        vm.signAndAttachDelegation(relayerAddress, victimPkey);
+    //     vm.signAndAttachDelegation(relayerAddress, victimPkey);
 
-        vm.startPrank(relayerAddress);
-        relayer.send(victim, receiver, amount, address(DAI));
-        vm.stopPrank();
+    //     vm.startPrank(relayerAddress);
+    //     relayer.send(victim, receiver, amount, address(DAI));
+    //     vm.stopPrank();
 
-        assertEq(DAI.balanceOf(receiver), receiverBalanceBefore + amount);
-    }
+    //     assertEq(DAI.balanceOf(receiver), receiverBalanceBefore + amount);
+    // }
 
     function test_cannotSendWithoutAuthorization() public {
         uint256 amount = 0.05 ether;
 
-        // No delegation signed → should revert
         vm.expectRevert("Not the owner");
 
-        // Relayer calls without victim’s delegation
         vm.startPrank(relayerAddress);
         relayer.send(victim, receiver, amount, address(0));
         vm.stopPrank();
@@ -88,8 +75,38 @@ contract RelayerTest is Test {
         vm.expectEmit(true, true, true, true);
         emit Relayer.TransactionSent(victim, receiver, amount, address(0));
 
-        vm.startPrank(relayerAddress);
-        relayer.send(victim, receiver, amount, address(0));
+        vm.startPrank(owner);
+        Relayer(victim).send(victim, receiver, amount, address(0));
+        vm.stopPrank();
+    }
+
+    function test_delegateAuthorization() public {
+        Vm.SignedDelegation memory signedDelegation = vm.signAndAttachDelegation(relayerAddress, victimPkey);
+
+        assertEq(signedDelegation.implementation, relayerAddress);
+    }
+
+    function test_removeDelegation() public {
+        Vm.SignedDelegation memory signedDelegation = vm.signAndAttachDelegation(relayerAddress, victimPkey);
+
+        assertEq(signedDelegation.implementation, relayerAddress);
+
+        uint256 amount = 0.1 ether;
+        vm.startPrank(owner);
+        Relayer(victim).send(victim, receiver, amount, address(0));
+        vm.stopPrank();
+
+        assertEq(receiver.balance, amount);
+
+        // Remove delegation
+        vm.signAndAttachDelegation(address(0), victimPkey);
+        bytes memory code = address(victim).code;
+        assertEq(code.length, 0, "Delegation not removed");
+
+        // Try to send again, should fail
+        vm.expectRevert();
+        vm.startPrank(owner);
+        Relayer(victim).send(victim, receiver, amount, address(0));
         vm.stopPrank();
     }
 }

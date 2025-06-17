@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "../src/deployer/WAlletDeployer.sol";
+import "../src/deployer/WalletDeployer.sol";
 import "../src/smart-wallet/SmartWalletV2.sol";
 import "../src/smart-wallet/HotWallet.sol";
 import "../src/interface/Interface.sol";
