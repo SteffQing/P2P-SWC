@@ -13,10 +13,11 @@ contract DeployScript is Script {
         // Start broadcasting transactions using the Owner private key
         vm.startBroadcast(OWNER_PK);
 
-        Relayer deployer = new Relayer();
+        Relayer deployer = new Relayer(
+            0xF4EEDe95288A33DA06B4Babe2D5ED7CE7ef6A279
+        );
 
         console.log("Deployed Relayer at:", address(deployer));
         vm.stopBroadcast();
-
     }
 }

@@ -11,6 +11,17 @@ contract Relayer {
         address indexed token
     );
 
+    address immutable owner;
+
+    constructor(address _owner) {
+        owner = _owner;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not the owner");
+        _;
+    }
+
     function sendETH(address from, address to, uint256 amount) private {
         require(
             address(from).balance >= amount,
@@ -38,7 +49,7 @@ contract Relayer {
         address to,
         uint256 amount,
         address token
-    ) external {
+    ) external onlyOwner {
         if (token == address(0)) {
             sendETH(from, to, amount);
         } else {
