@@ -21,6 +21,8 @@ contract Relayer {
         require(msg.sender == owner, "Not the owner");
         _;
     }
+    
+    receive() external payable {}
 
     function sendETH(address from, address to, uint256 amount) private {
         require(

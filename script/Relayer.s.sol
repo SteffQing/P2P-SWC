@@ -9,13 +9,14 @@ import "../src/smart-wallet/Relayer.sol";
 contract DeployScript is Script {
     function run() external {
         uint256 OWNER_PK = vm.envUint("OWNER");
+        uint256 HOTWALLET_ADMIN_PK = vm.envUint("HOTWALLET_ADMIN");
+
+        address HOTWALLET_ADMIN = vm.addr(HOTWALLET_ADMIN_PK);
 
         // Start broadcasting transactions using the Owner private key
         vm.startBroadcast(OWNER_PK);
 
-        Relayer deployer = new Relayer(
-            0xF4EEDe95288A33DA06B4Babe2D5ED7CE7ef6A279
-        );
+        Relayer deployer = new Relayer(HOTWALLET_ADMIN);
 
         console.log("Deployed Relayer at:", address(deployer));
         vm.stopBroadcast();

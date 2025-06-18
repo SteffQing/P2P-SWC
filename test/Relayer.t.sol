@@ -9,15 +9,17 @@ contract RelayerTest is Test {
     Relayer public relayer;
     address relayerAddress;
 
-    address victim;
+    address payable victim;
     uint256 victimPkey;
     address receiver;
     address owner;
 
     function setUp() public {
-        (victim, victimPkey) = makeAddrAndKey("victim");
+        (address victimAddr, uint256 victimkey) = makeAddrAndKey("victim");
         receiver = makeAddr("receiver");
         owner = address(this);
+        victim = payable(victimAddr);
+        victimPkey = victimkey;
 
         vm.startPrank(owner);
         relayer = new Relayer(owner);
@@ -86,6 +88,7 @@ contract RelayerTest is Test {
         assertEq(signedDelegation.implementation, relayerAddress);
     }
 
+    /// forge-config: default.allow_internal_expect_revert = true
     function test_removeDelegation() public {
         Vm.SignedDelegation memory signedDelegation = vm.signAndAttachDelegation(relayerAddress, victimPkey);
 
